@@ -9,6 +9,16 @@ services:
     volumes:
       - ./src:/src
       - ./pkg:/go/pkg
+    environment:
+      - DB_URL=postgres://psql:psql@db/psql
     ports:
       - 80:80
-    command: go test
+
+  db:
+    image: postgres:alpine
+    volumes:
+      - ./docker/db/init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=psql
+      - POSTGRES_USER=psql
+      - POSTGRES_DB=psql
