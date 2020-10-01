@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: .
+      target: develop
+    image: tikhoplav/partyphone:dev
+    volumes:
+      - ./src:/src
+      - ./pkg:/go/pkg
+    ports:
+      - 80:80
+    command: go test
