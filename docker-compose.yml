@@ -9,6 +9,7 @@ services:
     volumes:
       - ./src:/src
       - ./pkg:/go/pkg
+      - ./public:/public
     environment:
       - DB_URL=postgres://psql:psql@db/psql
     ports:

@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v4"
 	"context"
+	"strings"
 	"fmt"
 	"os"
 )
@@ -25,15 +26,18 @@ func main() {
 
 	api(app)
 
-	app.Get("/*", func(c *fiber.Ctx) error {
-		return c.SendString("Hello World!")
+	app.Static("/", "/public")
+
+	app.Get("*", func(c *fiber.Ctx) error {
+		c.SendFile("/public/index.html")
+		return nil
 	})
 
 	app.Listen(":80")
 }
 
 func api(app *fiber.App) fiber.Router {
-	api := app.Group("/api")
+	api := app.Group("/api", auth)
 
 	api.Get("/", func(c *fiber.Ctx) error {
 		var id int64
@@ -55,4 +59,22 @@ func api(app *fiber.App) fiber.Router {
 	})
 
 	return api
+}
+
+func auth(c *fiber.Ctx) error {
+	// Parse creadentials from the request header
+	// Decode credentials, convert to `email` and `password`
+	// Find user in database with specified credentials
+	// Attach user info (`id`, `name`, `login`) to request and pass to Next
+	// If any of the steps failed return Unauthrized error
+
+	h := fmt.Sprintf("%s", c.Request().Header.Peek("Authorization"))	
+
+	switch auth := strings.Fields(h); strings.ToLower(auth[0]) {
+	case "basic":
+		c.Next()
+		return nil
+	}
+
+	return fiber.ErrUnauthorized
 }
